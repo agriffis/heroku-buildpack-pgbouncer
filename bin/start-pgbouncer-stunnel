@@ -35,6 +35,11 @@ trap '' SIGTERM
 (
   #We expect pgbouncer to run in the foreground.
   echo 'buildpack=pgbouncer at=pgbouncer-start'
+
+  # Trim the date/time header which heroku provides via logplex
+  # 2014-03-03 21:04:52.374 24 LOG C-0x231ae30: dd547vaslqfl1i/uchqgkcomu7enh@127.0.0.1:59534 ACTUAL MESSAGE HERE
+  exec > >(sed -ru 's/^....-..-.. +..:..:[0-9.]* +[^:]*: +[^ :]*:[0-9]+ +//') 2>&1
+
   vendor/pgbouncer/bin/pgbouncer vendor/pgbouncer/pgbouncer.ini
   echo 'pgbouncer' >$psmgr
 ) &
